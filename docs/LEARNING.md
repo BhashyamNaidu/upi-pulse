@@ -43,3 +43,48 @@ a clean Ubuntu machine. A PR is merged only when CI is green, so `main` always w
 
 **ADR (Architecture Decision Record).** A short note per important choice: context, decision,
 alternatives, consequences. It answers "why did you do it this way?" months later.
+
+## Phase 1: Source discovery + ingestion
+
+**Respecting bot protection.** NPCI's site is behind Akamai, a firewall that returned HTTP 403 to
+my script even with an honest User-Agent. RBI's files sit behind an F5 JavaScript challenge. I could
+fake a browser, but that's getting around the publisher's access control, so I didn't
+(ADR-0002). In a real job the fix is a data-sharing agreement or an official API, not a cleverer
+scraper.
+
+**Manual drop.** Instead, a person downloads the official files into
+`data/manual_drop/<source>/<period>/`. From that point on the pipeline is fully automated and
+treats the folder like any other source. It's a common pattern in real companies too, where partners
+drop files on an SFTP server or a shared bucket.
+
+**Landing zone.** The first lake layer holds files *exactly* as received: no renaming, no opening and
+re-saving. If a parser bug shows up later, I can re-parse the original bytes without going back to
+the source.
+
+**SHA-256 checksum.** A fingerprint of a file's bytes. Change one byte and the checksum changes
+completely. I use it to (1) detect a file I've already landed, (2) spot when NPCI or RBI revise a
+file, and (3) catch mistakes, like the same file saved into two month folders.
+
+**Content-addressed paths.** Landed files go to `.../sha256=<first 12 hex>/<file name>`. Because the
+checksum is in the path, a revised file can never overwrite the earlier version, and the same bytes
+always map to the same place.
+
+**Idempotency.** Running a step twice gives the same result as running it once. Here, a file whose
+(source, period, checksum) is already in the manifest is skipped, so a second `make ingest` lands
+nothing. The `test_rerun_is_idempotent` test checks this, down to the manifest being byte-for-byte unchanged.
+
+**Atomic writes.** Each file is copied to `name.partial` and then renamed. On one filesystem a rename
+is all-or-nothing, so no later step ever reads a half-copied file. If the process crashes after the
+copy but before the manifest write, the next run sees the file is already correct and just records it.
+
+**Manifest (JSON Lines).** An append-only log with one JSON object per line: source, period, file
+name, checksum, size, origin URL and timestamps. It's the audit trail ("where did this number come
+from?") and it can be read straight into Spark.
+
+**Financial year periods.** NPCI's product statistics come as one file per Indian financial year
+(April to March), so that source uses `FY2025-26` periods. `fiscal_year_of(2026, 3)` is `FY2025-26`,
+but April 2026 starts `FY2026-27`.
+
+**No silent drops.** Every file in the drop folder ends up landed, skipped (already present) or
+rejected with a reason. `make ingest` exits with code 1 when anything is rejected, so Airflow will
+flag it later.

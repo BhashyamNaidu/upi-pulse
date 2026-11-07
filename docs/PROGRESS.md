@@ -41,8 +41,11 @@
 - ✅ Source discovery written up in `docs/DATA_SOURCES.md`.
 - ✅ ADR-0002: every source blocks automated downloads (Akamai 403 / JS bot challenge), so ingestion
   reads from `data/manual_drop/`.
-- ⏳ Waiting for Bhashyam to download the files by hand (see the drop-folder layout in ADR-0002).
-- ⏳ Then: manifest/checksum landing code, parsers, fixture tests, `make ingest`.
+- ✅ Target window agreed: **2024-10 → 2026-09 (24 months)**. Checklist: `docs/MANUAL_DOWNLOAD.md`.
+- ✅ Landing code: `upi_pulse.ingestion` (source registry, SHA-256 manifest, idempotent atomic
+  landing, `make ingest`, `make drop-status`). 39 unit tests, 99% coverage.
+- ⏳ Waiting for Bhashyam to download the 76 files (`make drop-status` lists what's missing).
+- ⏳ Then: parsers for each format, tests on real fixture excerpts, Phase 1 PR.
 
 ## Blockers / open questions
 - **Manual downloads needed** before parsers can be written against real files.
