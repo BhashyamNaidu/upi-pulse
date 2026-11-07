@@ -5,8 +5,8 @@
 ## Status
 | Phase | Status | Branch | Tag |
 |---|---|---|---|
-| 0. Project skeleton | ✅ Done | `phase-0-skeleton` | — |
-| 1. Source discovery + ingestion | ⏭️ Next | `phase-1-ingestion` | — |
+| 0. Project skeleton | ✅ Done (PR #1) | `phase-0-skeleton` | — |
+| 1. Source discovery + ingestion | 🔄 In progress: discovery done, waiting on manual downloads | `phase-1-ingestion` | — |
 | 2. Bronze → Silver (PySpark + Delta) | Not started | | v0.1.0 |
 | 3. Gold with dbt + data quality | Not started | | |
 | 4. Orchestration + CI | Not started | | v0.2.0 |
@@ -37,5 +37,14 @@
 | GNU make | Missing |
 | Azure CLI | Missing (needed in Phase 5) |
 
+## Phase 1: progress so far (2026-11-07)
+- ✅ Source discovery written up in `docs/DATA_SOURCES.md`.
+- ✅ ADR-0002: every source blocks automated downloads (Akamai 403 / JS bot challenge), so ingestion
+  reads from `data/manual_drop/`.
+- ⏳ Waiting for Bhashyam to download the files by hand (see the drop-folder layout in ADR-0002).
+- ⏳ Then: manifest/checksum landing code, parsers, fixture tests, `make ingest`.
+
 ## Blockers / open questions
-- None for Phase 1. Java 17 must be installed before Phase 2.
+- **Manual downloads needed** before parsers can be written against real files.
+- Bank performance (Top 50 Member Performance) columns not confirmed yet.
+- Java 17 must be installed before Phase 2.
