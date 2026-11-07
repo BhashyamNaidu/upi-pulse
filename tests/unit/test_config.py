@@ -34,3 +34,10 @@ def test_unknown_layer_rejected():
 def test_invalid_env_rejected():
     with pytest.raises(ValueError, match="UPI_PULSE_ENV"):
         load_settings({"UPI_PULSE_ENV": "prod"})
+
+
+def test_drop_dir_and_metrics_defaults_and_empty_values():
+    settings = load_settings({"UPI_PULSE_DROP_DIR": "", "UPI_PULSE_LAKE_ROOT": ""})
+    assert settings.drop_dir.endswith("data/manual_drop")
+    assert settings.lake_root.endswith("data/lake")
+    assert settings.metrics_path.endswith("metrics/run_metrics.json")
