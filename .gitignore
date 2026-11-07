@@ -1,0 +1,64 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+.python-version
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+.ipynb_checkpoints/
+
+# --- Spark / Delta ---
+spark-warehouse/
+metastore_db/
+derby.log
+*.crc
+data/**/_delta_log/
+
+# --- Lake data (never committed; only small fixtures under tests/fixtures/) ---
+data/raw/
+data/lake/
+data/manual_drop/*
+!data/manual_drop/.gitkeep
+
+# --- dbt ---
+dbt/**/target/
+dbt/**/dbt_packages/
+dbt/**/logs/
+
+# --- Airflow ---
+airflow/logs/
+airflow/plugins/__pycache__/
+airflow-webserver.pid
+logs/
+
+# --- Secrets / env ---
+.env
+.env.*
+!.env.example
+
+# --- Terraform ---
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl.bak
+crash.log
+*.tfvars
+!*.tfvars.example
+
+# --- OS / editors ---
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Power BI files ARE committed (dashboards/*.pbix) - intentionally not ignored.
