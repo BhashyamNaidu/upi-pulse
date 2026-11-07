@@ -3,7 +3,7 @@
 UV ?= uv
 .DEFAULT_GOAL := help
 
-.PHONY: help setup lint format test demo ingest pipeline dbt dq up down destroy
+.PHONY: help setup lint format test demo ingest drop-status pipeline dbt dq up down destroy
 
 help: ## Show available targets
 	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-10s %s\n", $$1, $$2}'
@@ -26,8 +26,11 @@ test: ## Unit + integration tests with coverage (>=80%)
 demo: ## End-to-end run on committed fixtures (Phase 2+)
 	@echo "demo: not implemented yet (arrives in Phase 2)"; exit 1
 
-ingest: ## Download/collect source files into landing/ (Phase 1)
-	@echo "ingest: not implemented yet (arrives in Phase 1)"; exit 1
+ingest: ## Land new files from data/manual_drop/ into the lake (ADR-0002)
+	$(UV) run python -m upi_pulse.ingestion ingest
+
+drop-status: ## List source files still missing from data/manual_drop/
+	$(UV) run python -m upi_pulse.ingestion status
 
 pipeline: ## landing -> bronze -> silver in PySpark (Phase 2)
 	@echo "pipeline: not implemented yet (arrives in Phase 2)"; exit 1
