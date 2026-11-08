@@ -14,7 +14,9 @@ from upi_pulse.metrics import record_step
 def test_sha256_matches_known_digest(tmp_path):
     path = tmp_path / "abc.bin"
     path.write_bytes(b"abc")
-    assert sha256_file(path) == "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"
+    # Published NIST FIPS 180-2 test vector for SHA-256("abc"), not a secret.
+    expected = "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"  # noqa: E501  # pragma: allowlist secret
+    assert sha256_file(path) == expected
 
 
 def test_manifest_round_trip(tmp_path):
