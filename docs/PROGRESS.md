@@ -54,9 +54,8 @@
 ## Blockers / open questions
 - **Manual downloads needed** before parsers can be written against real files. On 2026-11-10 the
   drop folder had 0 of 75 required files.
-- **pre-commit hooks not installed:** the project path makes a venv file 262 characters long
-  (Windows limit 260). Fix: move the project to a short path such as `C:\code\upi-pulse`, or
-  enable `LongPathsEnabled` (admin). `git config --global core.longpaths true` is set but only
-  affects git.
+- ✅ Resolved 2026-11-11: the project now lives at `C:\Users\User\Downloads\UPI_pulse` (a fresh
+  clone). The old app-made folder's path pushed a venv file to 262 characters (limit 260).
+  `pre-commit install` works and hooks run on every commit.
 - Bank performance (Top 50 Member Performance) columns not confirmed yet.
 - Java 17 must be installed before Phase 2.
