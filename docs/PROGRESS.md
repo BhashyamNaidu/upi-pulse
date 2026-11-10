@@ -45,9 +45,18 @@
 - ✅ Landing code: `upi_pulse.ingestion` (source registry, SHA-256 manifest, idempotent atomic
   landing, `make ingest`, `make drop-status`). 39 unit tests, 99% coverage.
 - ⏳ Waiting for Bhashyam to download the 76 files (`make drop-status` lists what's missing).
-- ⏳ Then: parsers for each format, tests on real fixture excerpts, Phase 1 PR.
+- ✅ Format-agnostic parsing helpers (2026-11-10): `parse_number` (tested on real NPCI strings),
+  unit detection/conversion (`normalisation/units.py`), totals detection and the tidy row contract
+  (`parsing/tidy.py`). The tidy table adds `row_kind` (`detail`/`total`) so totals are separated,
+  not dropped. 91 tests, 99.4% coverage.
+- ⏳ Then: layout-specific parsers per source, tests on real fixture excerpts, Phase 1 PR.
 
 ## Blockers / open questions
-- **Manual downloads needed** before parsers can be written against real files.
+- **Manual downloads needed** before parsers can be written against real files. On 2026-11-10 the
+  drop folder had 0 of 75 required files.
+- **pre-commit hooks not installed:** the project path makes a venv file 262 characters long
+  (Windows limit 260). Fix: move the project to a short path such as `C:\code\upi-pulse`, or
+  enable `LongPathsEnabled` (admin). `git config --global core.longpaths true` is set but only
+  affects git.
 - Bank performance (Top 50 Member Performance) columns not confirmed yet.
 - Java 17 must be installed before Phase 2.
