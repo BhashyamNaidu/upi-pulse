@@ -88,3 +88,18 @@ but April 2026 starts `FY2026-27`.
 **No silent drops.** Every file in the drop folder ends up landed, skipped (already present) or
 rejected with a reason. `make ingest` exits with code 1 when anything is rejected, so Airflow will
 flag it later.
+
+**Parsing numbers you can't trust.** NPCI publishes numbers as text, and the commas are
+inconsistent: `31,52,929.46` (Indian grouping), `22716.07` (none), and even `29,029,88.05`
+(mis-grouped). `parse_number` strips separators to get the value, but records the *grouping* it
+saw, so a mis-grouped value is parsed and flagged `needs_review` rather than silently "fixed".
+`Decimal` is used instead of `float` so ₹ crore amounts don't pick up binary rounding errors.
+
+**Units: lakh, crore, million.** 1 lakh = 100,000, 1 crore = 100 lakh = 10 million, 1 million =
+10 lakh. Silver stores volume in millions and value in ₹ crore. Parsers only *record* the header
+text (`unit_raw`); conversion happens in silver, so a wrong unit guess can be fixed and replayed.
+A header with two units, or none, isn't guessed. It's rejected so the row can be quarantined.
+
+**Totals rows.** Tables often end with a "Total" row. If it's treated like any other row, sums
+double count. Parsers tag it `row_kind="total"` instead of deleting it, so we can also check that
+the detail rows add up to the published total.
